@@ -29,3 +29,31 @@ app.get("/", (req: Request, res: Response) => {
 app.listen(PORT, () => {
   console.log(`💥 Servidor rodando em http://localhost:${PORT}`);
 });
+
+app.get("/sobre", (req: Request, res: Response)=>{
+  res.json({
+    "curso": "Desenvolvimento de Sistemas",
+    "professora": "Dalvana",
+    "versao": "1.0" 
+  });
+});
+
+app.get("/hora", (req: Request, res: Response)=>{
+  res.json({
+    "hora": hora()
+  });
+});
+
+app.get("/bemvindo/:nome", (req: Request, res: Response)=>{
+  const nome = req.params
+
+  res.json({
+    nome
+  })
+});
+
+function hora() {
+  let hora = new Date().toLocaleTimeString("pt-BR");
+
+  return hora;
+}
