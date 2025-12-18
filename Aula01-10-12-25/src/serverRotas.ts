@@ -3,6 +3,27 @@ import express, { Request, Response, NextFunction } from "express";
 const app = express(); 
 const PORT = 3000;
 
+class Jogador {
+    nome: string
+    id: number
+    constructor(nome: string, id: number) {
+        this.nome = nome
+        this.id = id
+    }
+
+    getNome(): string{
+        return this.nome
+    }
+
+    getId(): number{
+        return this.id
+    }
+
+    setNome(nome: string): void{
+        this.nome = nome
+    }
+}
+
 app.use(express.json());
 
 app.get("/", (req: Request, res: Response) => {
@@ -16,7 +37,12 @@ app.listen(PORT, () => {
 // Cria uma array de strings
 // simula um banco de dados em memória
 
-const jogadores: string[] = []
+const jogadores: Jogador[] = []
+
+// jogadores.push(new Jogador("Gabiss", 1))
+// jogadores.push(new Jogador("Buffon", 2))
+// jogadores.push(new Jogador("Yago Raichu", 3))
+// jogadores.push(new Jogador("Pelé", 4))
 
 // Função middleware personalizada
 // ela será executada ANTES das rotas
@@ -55,6 +81,9 @@ app.get("/jogadores", (req: Request, res: Response, next: NextFunction)=>{
 app.post("/jogadores", (req: Request, res: Response, next: NextFunction)=>{
     // Captura o nome enviado no corpo da requisição
     const nome = req.body.nome
+    const id = req.body.id
+
+    const novoJogador = new Jogador(nome, id)
     // Validação básica (verifica se o nome existe ou está vazio)
 
     if (!nome || nome.trim() === "") {
@@ -62,7 +91,8 @@ app.post("/jogadores", (req: Request, res: Response, next: NextFunction)=>{
             erro: "Nome é obrigatório"
         })
     }
-    jogadores.push(nome)
+
+    jogadores.push(novoJogador)
 
     res.json({
         mensagem: "Jogador cadastrado com sucesso!",
@@ -76,7 +106,7 @@ app.post("/jogadores", (req: Request, res: Response, next: NextFunction)=>{
 
 app.put("/jogador/:id", (req: Request, res: Response, next: NextFunction)=>{
     // Converter o parâmetro da URL para número
-    const id = Number(req.params.id)
+    const id = Number(req.params.id)-1
     // Captura o novo nome enviada no body
     const novoNome = req.body.nome
     // Verifica se existe usuário nesse índice
@@ -86,7 +116,8 @@ app.put("/jogador/:id", (req: Request, res: Response, next: NextFunction)=>{
         })
     }
     // Atualiza o usuário no Array
-    jogadores[id] = novoNome
+    console.log(novoNome)
+    jogadores[id].setNome(novoNome)
 
     res.json({
         mensagem: "Jogador atualizado com sucesso!",
@@ -102,13 +133,16 @@ app.delete("/jogadores/:id", (req: Request, res: Response, next: NextFunction)=>
     // Converter o ID da URL para número
     const id = Number(req.params.id)
     // Verifica se o usuário existe
-    if (!jogadores[id]) {
-        return res.status(404).json({
-            erro: "Jogador não encontrado!"
-        })
-    }
+    // if (!jogadores[id-1]) {
+    //     return res.status(404).json({
+    //         erro: "Jogador não encontrado!"
+    //     })
+    // }
 
-    jogadores.splice(id, 1)
+
+            let idEncotrado = jogadores.findIndex(jogador => jogador.id === id);
+            jogadores.splice(idEncotrado, 1)
+  
 
     res.json({
         mensagem: "Jogador removido com sucesso!",
